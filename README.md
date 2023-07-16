@@ -1,3 +1,7 @@
+# Ref
+
+Setup using this guide: https://www.simplethread.com/how-to-create-a-new-rails-7-app-with-tailwind/
+
 # README
 
 This README would normally document whatever steps are necessary to get the
