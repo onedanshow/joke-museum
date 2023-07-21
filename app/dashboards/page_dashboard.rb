@@ -11,6 +11,7 @@ class PageDashboard < Administrate::BaseDashboard
     id: Field::Number,
     jokes: Field::HasMany,
     keywords: Field::String,
+    shopify_id: Field::Number,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
   }.freeze
@@ -33,6 +34,7 @@ class PageDashboard < Administrate::BaseDashboard
     id
     jokes
     keywords
+    shopify_id
     created_at
     updated_at
   ].freeze
@@ -42,6 +44,7 @@ class PageDashboard < Administrate::BaseDashboard
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = %i[
     keywords
+    shopify_id
   ].freeze
 
   # COLLECTION_FILTERS

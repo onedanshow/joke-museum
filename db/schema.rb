@@ -31,6 +31,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_21_050119) do
 
   create_table "pages", force: :cascade do |t|
     t.string "keywords"
+    t.bigint "shopify_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
