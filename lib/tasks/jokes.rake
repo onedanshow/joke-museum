@@ -3,13 +3,17 @@ namespace :jokes do
   task import: :environment do
     require 'csv'
 
-    path = Rails.root.join('lib', 'jokes.csv')
+    FILE = "t_lightbulbs-cleaned.csv"
+    URL = "https://www.kaggle.com/datasets/bfinan/jokes-question-and-answer"
+
+    path = Rails.root.join('lib', FILE)
     csv_text = File.read(path)
     csv = CSV.parse(csv_text, headers: true)
+    source = Source.create!(url: URL, filename: FILE)
 
     csv.each_with_index do |row, index|
-      puts "Joke #{index + 1}: #{row[1]} - #{row[2]}"
-      Joke.create!(setup: row[1], punchline: row[2])
+      puts "Joke #{index + 1}: #{row['Question']} - #{row['Answer']}"
+      source.jokes << Joke.create!(setup: row['Question'], punchline: row['Answer'], joke_type: :light_bulb)
     end
 
     puts "Import completed!"
