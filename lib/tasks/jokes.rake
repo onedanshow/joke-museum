@@ -24,9 +24,9 @@ namespace :jokes do
       else 
         ShopifyAPI::Page.new(session: session)
       end
-      
+
       keywords = page.keywords.downcase
-      jokes = Joke.where('setup ILIKE ? OR punchline ILIKE ?',"%#{keywords}%","%#{keywords}%")
+      jokes = Joke.where('setup ILIKE ? OR punchline ILIKE ?',"% #{keywords} %","% #{keywords} %")
       next if jokes.empty?
 
       shopify_page.title = "#{jokes.count}+ #{page.keywords.titleize} Jokes"
