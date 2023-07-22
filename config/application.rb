@@ -20,3 +20,13 @@ module JokeMuseum
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
+
+ShopifyAPI::Context.setup(
+  api_key: ENV['SHOPIFY_API_KEY'],
+  api_secret_key: ENV['SHOPIFY_API_SECRET_KEY'],
+  host: "<https://application-host-name.com>",
+  scope: "read_analytics, read_content, read_customers, read_fulfillments, read_orders, read_products, read_script_tags, read_shipping, write_themes, read_inventory, read_locations, read_themes, write_content",
+  is_embedded: false, # Set to true if you are building an embedded app
+  api_version: "2023-07", # The version of the API you would like to use
+  is_private: false, # Set to true if you have an existing private app
+)
