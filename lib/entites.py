@@ -7,7 +7,7 @@ nlp = spacy.load("en_core_web_sm")
 nlp.max_length = 5000000
 
 # Read CSV file
-df = pd.read_csv('./lib/qajokes1.1.2-cleaned.csv')
+df = pd.read_csv('./qajokes1.1.2-cleaned.csv')
 
 # Filter rows where 'Dirty?' is not equal to 0
 df = df[df['Dirty?'] == 0]
@@ -19,10 +19,14 @@ text = ' '.join(str(x) for x in df['Question'].tolist() + df['Answer'].tolist())
 # Process the text
 doc = nlp(text)
 
-# Extract named entities, nouns, and verbs
-entities = [(ent.text, ent.label_, spacy.explain(ent.label_)) for ent in doc.ents]
-nouns = list(set(chunk.text for chunk in doc.noun_chunks))
-verbs = list(set(token.lemma_ for token in doc if token.pos_ == "VERB"))
+# Extract named entities, removing duplicates and stop words
+entities = list(set((' '.join(w for w in ent.text.split() if w.lower() not in nlp.Defaults.stop_words), ent.label_, spacy.explain(ent.label_)) for ent in doc.ents))
+
+# Extract nouns, removing duplicates and stop words
+nouns = list(set(' '.join(w for w in chunk.text.split() if w.lower() not in nlp.Defaults.stop_words) for chunk in doc.noun_chunks))
+
+# Extract verbs, removing duplicates and stop words
+verbs = list(set(token.lemma_ for token in doc if token.pos_ == "VERB" and token.lemma_.lower() not in nlp.Defaults.stop_words))
 
 # Write to new CSV files
 df_entities = pd.DataFrame(entities, columns=['Entity', 'Label', 'Explanation'])

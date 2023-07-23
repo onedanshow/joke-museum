@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_22_213221) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_23_153603) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -35,6 +35,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_22_213221) do
     t.bigint "shopify_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["keywords"], name: "index_pages_on_keywords", unique: true
   end
 
   create_table "sources", force: :cascade do |t|
