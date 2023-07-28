@@ -19,10 +19,28 @@ namespace :jokes do
     puts "Import completed!"
   end
 
+  desc "Process jokes to extract entities, nouns and verbs"
+  task process: :environment do
+    Joke.find_each do |joke|
+      text = [joke.setup, joke.punchline].join(' ')
+      result = JSON.parse(`python3 lib/tasks/nlp.py "#{text}"`)
+      puts "Processing #{joke.id} - #{result}"
+=begin      
+      result.each do |type, words|
+        words.each do |word|
+          page = Page.find_or_create_by!(keywords: word.downcase)
+          page.jokes << joke unless page.jokes.include?(joke)
+        end
+      end
+=end      
+    end
+  end
+
   desc "Create Joke pages on Shopify"
   task create_pages: :environment do
     session = ShopifyAPI::Auth::Session.new(shop: 'gossamergeardev.myshopify.com', access_token: ENV['SHOPIFY_ADMIN_API_ACCESS_TOKEN'])
     Page.find_each do |page|
+      # TODO: Don't make Shopify for pages with only one (maybe two) jokes
       begin
         shopify_page = if page.shopify_id.present?
           ShopifyAPI::Page.find(id: page.shopify_id, session: session) 
