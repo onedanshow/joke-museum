@@ -32,7 +32,7 @@ namespace :jokes do
           page.jokes << joke unless page.jokes.include?(joke)
         end
       end
-=end      
+=end
     end
   end
 
