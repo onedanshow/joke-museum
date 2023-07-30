@@ -1,31 +1,25 @@
-require 'wordnet'
-
 class MatchPages
+  attr_reader :page
+
   def initialize(page)
     @page = page
   end
 
   def call
-    match_pages = []
-    Page.where.not(id: @page.id).each do |other_page|
-      match_score = calculate_match_score(other_page)
-      match_pages << { page: other_page, score: match_score } if match_score > 0
-    end
-    match_pages.sort_by { |match| match[:score] }.reverse
-  end
+    # Find related jokes via pg_search
+    related_jokes = Joke.search(@page.keywords)
 
-  private
+    # Get unique page IDs associated with these jokes, excluding the current page ID
+    related_page_ids = related_jokes.flat_map(&:page_ids).uniq.reject { |id| id == @page.id }
 
-  def calculate_match_score(other_page)
-    lemma_index = WordNet::LemmaIndex.instance
-    match_score = 0
-    @page.keywords.each do |keyword|
-      other_page.keywords.each do |other_keyword|
-        keyword_lemma = lemma_index.find(keyword)
-        other_keyword_lemma = lemma_index.find(other_keyword)
-        match_score += keyword_lemma.distance_to(other_keyword_lemma) if keyword_lemma && other_keyword_lemma
-      end
+    # Limit the page_ids to the first 100
+    related_page_ids = related_page_ids.take(100)
+
+    # Find or create related pages and attach them to the current page
+    related_page_ids.each do |related_page_id|
+      related_page = Page.find_by(id: related_page_id)
+
+      page.related_pages << related_page unless page.related_pages.include?(related_page)
     end
-    match_score
   end
 end

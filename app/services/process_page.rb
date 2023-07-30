@@ -4,7 +4,7 @@ class ProcessPage
   end
 
   def call(page)
-    shopify_page = find_shopify_page_by_handle(page) || find_or_initialize_shopify_page(page)
+    shopify_page = find_or_initialize_shopify_page(page)
 
     shopify_page.title = "#{page.jokes.count}+ #{page.keywords.titleize} Jokes"
     shopify_page.handle = page.handle
@@ -22,14 +22,12 @@ class ProcessPage
 
   private
 
-  def find_shopify_page_by_handle(page)
-    shopify_pages = ShopifyAPI::Page.all(handle: page.handle, session: @session)
-    shopify_pages.first
-  end
-
   def find_or_initialize_shopify_page(page)
     if page.shopify_id.present?
       ShopifyAPI::Page.find(id: page.shopify_id, session: @session)
+    elsif page.handle.present?
+      shopify_pages = ShopifyAPI::Page.all(handle: page.handle, session: @session)
+      shopify_pages.first
     else
       ShopifyAPI::Page.new(session: @session)
     end
