@@ -22,17 +22,7 @@ namespace :jokes do
   desc "Process jokes to extract entities, nouns and verbs"
   task process: :environment do
     Joke.find_each do |joke|
-      text = [joke.setup, joke.punchline].join(' ')
-      result = JSON.parse(`python3 lib/tasks/nlp.py "#{text}"`)
-      puts "Processing #{joke.id} - #{result}"
-=begin      
-      result.each do |type, words|
-        words.each do |word|
-          page = Page.find_or_create_by!(keywords: word.downcase)
-          page.jokes << joke unless page.jokes.include?(joke)
-        end
-      end
-=end
+      ProcessJoke.new(joke).process
     end
   end
 
@@ -47,15 +37,12 @@ namespace :jokes do
         else 
           ShopifyAPI::Page.new(session: session)
         end
-  
-        jokes = Joke.search(page.keywords)
-        next if jokes.empty?
-  
-        shopify_page.title = "#{jokes.count}+ #{page.keywords.titleize} Jokes"
+
+        shopify_page.title = "#{page.jokes.count}+ #{page.keywords.titleize} Jokes"
         shopify_page.handle = "#{page.keywords.parameterize}-jokes"
         
         html = "<ul>"
-        jokes.find_each do |joke|
+        page.jokes.find_each do |joke|
           html += "<li>#{joke.setup}<br/>#{joke.punchline}</li>"
         end
         html += "</ul>"
