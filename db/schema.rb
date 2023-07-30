@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_30_132458) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_30_185609) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -31,6 +31,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_30_132458) do
     t.index ["page_id", "joke_id"], name: "index_jokes_pages_on_page_id_and_joke_id_uniq", unique: true
   end
 
+  create_table "page_relations", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.bigint "related_page_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["page_id", "related_page_id"], name: "index_page_relations_on_page_id_and_related_page_id", unique: true
+    t.index ["page_id"], name: "index_page_relations_on_page_id"
+    t.index ["related_page_id"], name: "index_page_relations_on_related_page_id"
+  end
+
   create_table "pages", force: :cascade do |t|
     t.citext "keywords", null: false
     t.bigint "shopify_id"
@@ -49,4 +59,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_30_132458) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "page_relations", "pages"
+  add_foreign_key "page_relations", "pages", column: "related_page_id"
 end

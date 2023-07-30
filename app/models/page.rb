@@ -1,5 +1,7 @@
 class Page < ApplicationRecord
   has_and_belongs_to_many :jokes
+  has_many :page_relations, dependent: :destroy
+  has_many :related_pages, through: :page_relations
 
   validates :keywords, uniqueness: true, presence: true
 

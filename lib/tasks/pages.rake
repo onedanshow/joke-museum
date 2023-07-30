@@ -18,4 +18,19 @@ namespace :pages do
       count += 1
     end
   end
+
+  desc "Match Joke pages by Synonyms"
+  task create_update_shopify: :environment do
+    service = MatchPages.new(session)
+    count = 1
+
+    Page.find_each do |page|
+      next if page.jokes.count < 3
+      puts "#{count}: Processing Page #{page.id}: #{page.keywords}"
+
+      service.call(page)
+      sleep 0.5
+      count += 1
+    end
+  end
 end
