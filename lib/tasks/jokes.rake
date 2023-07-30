@@ -3,46 +3,26 @@ namespace :jokes do
   task import: :environment do
     require 'csv'
 
-    path = Rails.root.join('lib', 'jokes.csv')
+    FILE = "t_lightbulbs-cleaned.csv"
+    URL = "https://www.kaggle.com/datasets/bfinan/jokes-question-and-answer"
+
+    path = Rails.root.join('lib', FILE)
     csv_text = File.read(path)
     csv = CSV.parse(csv_text, headers: true)
+    source = Source.create!(url: URL, filename: FILE)
 
     csv.each_with_index do |row, index|
-      puts "Joke #{index + 1}: #{row[1]} - #{row[2]}"
-      Joke.create!(setup: row[1], punchline: row[2])
+      puts "Joke #{index + 1}: #{row['Question']} - #{row['Answer']}"
+      source.jokes << Joke.create!(setup: row['Question'], punchline: row['Answer'], joke_type: :light_bulb)
     end
 
     puts "Import completed!"
   end
 
-  desc "Create Joke pages on Shopify"
-  task create_pages: :environment do
-    session = ShopifyAPI::Auth::Session.new(shop: 'gossamergeardev.myshopify.com', access_token: ENV['SHOPIFY_ADMIN_API_ACCESS_TOKEN'])
-    Page.find_each do |page|
-      shopify_page = if page.shopify_id.present?
-        ShopifyAPI::Page.find(id: page.shopify_id, session: session) 
-      else 
-        ShopifyAPI::Page.new(session: session)
-      end
-
-      keywords = page.keywords.downcase
-      jokes = Joke.where('setup ILIKE ? OR punchline ILIKE ?',"% #{keywords} %","% #{keywords} %")
-      next if jokes.empty?
-
-      shopify_page.title = "#{jokes.count}+ #{page.keywords.titleize} Jokes"
-      shopify_page.handle = "#{page.keywords.parameterize}-jokes"
-      
-      html = "<ul>"
-      jokes.find_each do |joke|
-        html += "<li>#{joke.setup}<br/>#{joke.punchline}</li>"
-      end
-      html += "</ul>"
-      shopify_page.body_html = html
-      
-      shopify_page.save!
-      page.update!(shopify_id: shopify_page.id)
-
-      puts "Created page #{shopify_page.id} for #{page.keywords}"
+  desc "Process jokes to extract entities, nouns and verbs"
+  task process: :environment do
+    Joke.find_each do |joke|
+      ProcessJoke.new(joke).process
     end
   end
 end
