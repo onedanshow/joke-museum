@@ -8,7 +8,7 @@ class Page < ApplicationRecord
   private
 
   def set_handle
-    self.handle = generate_handle(keywords)
+    self.handle = Page.generate_handle(keywords)
   end
 
   def self.generate_handle(keywords)

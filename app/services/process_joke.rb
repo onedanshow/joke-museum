@@ -33,9 +33,9 @@ class ProcessJoke
     @output.each do |key, words|
       next unless key.include?('lemmatized') # process only lemmatized versions
 
-      words.each do |lemmatized_word|
-        cleaned_word = clean_keywords(lemmatized_word)
-        next if cleaned_word.blank?
+      words.each do |lemmatized_words|
+        cleaned_words = clean_keywords(lemmatized_words)
+        next if cleaned_words.blank?
 
         handle = Page.generate_handle(cleaned_words)
         page = Page.find_by(handle: handle)
