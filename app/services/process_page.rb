@@ -23,7 +23,7 @@ class ProcessPage
   private
 
   def find_shopify_page_by_handle(page)
-    shopify_pages = ShopifyAPI::Page.find(:all, params: { handle: page.handle }, session: @session)
+    shopify_pages = ShopifyAPI::Page.all(handle: page.handle, session: @session)
     shopify_pages.first
   end
 
