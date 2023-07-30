@@ -25,16 +25,4 @@ namespace :jokes do
       ProcessJoke.new(joke).process
     end
   end
-
-  desc "Create Joke pages on Shopify"
-  task create_pages: :environment do
-    session = ShopifyAPI::Auth::Session.new(shop: 'gossamergeardev.myshopify.com', access_token: ENV['SHOPIFY_ADMIN_API_ACCESS_TOKEN'])
-    service = ProcessPage.new(session)
-
-    Page.find_each do |page|
-      next if page.jokes.count < 3
-      
-      service.call(page)
-    end
-  end
 end

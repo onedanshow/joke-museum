@@ -3,13 +3,18 @@
 require 'csv'
 
 namespace :pages do
-  desc 'Import keywords from CSV files to Pages'
-  task import_entities: :environment do
-    ['entities', 'nouns', 'verbs'].each do |filename|
-      CSV.foreach(Rails.root.join('lib', "#{filename}.csv"), headers: true) do |row|
-        puts "Creating Page for #{row[0]}"
-        Page.find_or_create_by!(keywords: row[0])
-      end
+  desc "Create/Update Joke pages on Shopify"
+  task create_update_shopify: :environment do
+    session = ShopifyAPI::Auth::Session.new(shop: 'gossamergeardev.myshopify.com', access_token: ENV['SHOPIFY_ADMIN_API_ACCESS_TOKEN'])
+    service = ProcessPage.new(session)
+    count = 1
+
+    Page.find_each do |page|
+      next if page.jokes.count < 3
+      puts "#{count}: Processing Page #{page.id}: #{page.keywords}"
+
+      # service.call(page)
+      count += 1
     end
   end
 end
