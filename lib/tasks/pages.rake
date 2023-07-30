@@ -13,7 +13,8 @@ namespace :pages do
       next if page.jokes.count < 3
       puts "#{count}: Processing Page #{page.id}: #{page.keywords}"
 
-      # service.call(page)
+      service.call(page)
+      sleep 0.5
       count += 1
     end
   end

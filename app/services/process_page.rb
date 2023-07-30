@@ -10,7 +10,7 @@ class ProcessPage
     shopify_page.body_html = build_html_body(page.jokes)
 
     if shopify_page.save
-      page.update(shopify_id: shopify_page.id)
+      page.update!(shopify_id: shopify_page.id)
       puts "Created page #{shopify_page.id} for Page (#{page.id}): #{page.keywords}"
     else
       puts "FAILED for Page (#{page.id}): #{page.keywords}"
