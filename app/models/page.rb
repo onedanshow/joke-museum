@@ -3,9 +3,15 @@ class Page < ApplicationRecord
 
   validates :keywords, uniqueness: true, presence: true
 
-  after_create :set_handle
+  before_create :set_handle
+
+  private
 
   def set_handle
-    self.update_column(:handle, "#{self.keywords.parameterize}-jokes")
+    self.handle = generate_handle(keywords)
+  end
+
+  def self.generate_handle(keywords)
+    "#{keywords.parameterize}-jokes"
   end
 end
