@@ -16,7 +16,7 @@ class ProcessJoke
   private
 
   def run_python_nlp
-    text = [joke.setup, joke.punchline].join(' ')
+    text = [joke.setup, joke.punchline].join(' ').gsub(/["\/]/, '')
     puts "\nProcessing #{joke.id} - #{text}"
     @output = JSON.parse(`python3 lib/tasks/nlp.py "#{text}"`)
     puts "Output: #{@output}"

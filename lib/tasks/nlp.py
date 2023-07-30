@@ -13,13 +13,14 @@ def lemmatize(word):
     This function receives a word and returns its lemmatized version
     """
     doc = nlp(word)
-    return ' '.join([token.lemma_ for token in doc])
+    return ' '.join([token.lemma_ for token in doc if not token.is_stop])
 
 def normalize(word):
     """
     This function removes stopwords from the word
     """
-    return ' '.join([i for i in word.split() if i not in stop_words])
+    doc = nlp(word)
+    return ' '.join([token.text for token in doc if not token.is_stop])
 
 # Get the text argument from command line
 text = sys.argv[1]

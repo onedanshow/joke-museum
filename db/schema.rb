@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_29_221722) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_30_014403) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -32,11 +32,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_29_221722) do
   end
 
   create_table "pages", force: :cascade do |t|
-    t.citext "keywords"
+    t.citext "keywords", null: false
     t.bigint "shopify_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "excluded_joke_ids", default: [], array: true
+    t.string "handle"
     t.index ["keywords"], name: "index_pages_on_keywords", unique: true
   end
 
