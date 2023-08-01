@@ -17,7 +17,7 @@ class ProcessPage
       puts "FAILED for Page (#{page.id}): #{page.keywords}"
     end
 
-    update_shopify_page_relations(shopify_page, page)
+    set_related_pages_shopify_metafield(shopify_page, page)
   rescue ShopifyAPI::Errors::HttpResponseError => e
     puts "Shopify API error for #{page.keywords}: #{e.message}"
   end
@@ -35,13 +35,14 @@ class ProcessPage
     spage || ShopifyAPI::Page.new(session: @session)
   end
 
+  # TODO: set_jokes_shopify_metafield to replace this
   def build_html_body(jokes)
     jokes.reduce("<ul>") do |html, joke|
       html + "<li><h2>#{joke.setup}</h2><p>#{joke.punchline}</p></li>"
     end + "</ul>"
   end
 
-  def update_shopify_page_relations(shopify_page, page)
+  def set_related_pages_shopify_metafield(shopify_page, page)
     metafield = ShopifyAPI::Metafield.new(session: @session)
     metafield.page_id = shopify_page.id
     metafield.namespace = "moj"
