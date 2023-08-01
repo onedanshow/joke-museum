@@ -1,9 +1,9 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  url: MyText
-  filename: MyString
+  url: https://danieldixon.com
+  filename: DanielDixon.txt
 
 two:
-  url: MyText
-  filename: MyString
+  url: https://fitstack.com
+  filename: FitStack.txt
