@@ -7,7 +7,7 @@ class MatchPages
 
   def call
     # Find related jokes via pg_search
-    related_jokes = Joke.search(@page.keywords)
+    related_jokes = Joke.clean.search(@page.keywords)
 
     # Get unique page IDs associated with these jokes, excluding the current page ID
     related_page_ids = related_jokes.flat_map(&:page_ids).uniq.reject { |id| id == @page.id }
