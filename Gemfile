@@ -7,6 +7,8 @@ gem 'dotenv-rails'
 gem 'sitemap_generator'
 gem "administrate"
 gem "shopify_api"
+gem "tf-idf-similarity"
+gem "narray" # to make tf-idf-similarity faster
 gem "pg_search"
 gem "rails", "~> 7.0.6"
 
