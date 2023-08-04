@@ -2,28 +2,34 @@ require 'narray'
 require 'tf-idf-similarity'
 
 class FindDuplicateJokes
-  attr_reader :jokes, :corpus, :model
-
-  def initialize(jokes)
-    @jokes = jokes
-    # Preprocess the jokes and create a corpus of documents
-    @corpus = jokes.map do |joke|
-      text = preprocess(joke.setup + " " + joke.punchline)
-      TfIdfSimilarity::Document.new(text)
-    end
+  def initialize(joke)
+    @joke = joke
+    @joke_document = TfIdfSimilarity::Document.new(preprocess(@joke.setup + " " + @joke.punchline))
+    @corpus = []
   end
 
-  # Find duplicates for a given joke
-  def find_duplicates(joke, threshold: 0.7)
-    joke_document = TfIdfSimilarity::Document.new(preprocess(joke.setup + " " + joke.punchline))
-    puts "Creating TfIdfModel..."
-    @model = TfIdfSimilarity::TfIdfModel.new(@corpus + [joke_document], library: :narray)
-    puts "Calculating Similarity Matrix..."
-    @matrix = @model.similarity_matrix
+  def call(threshold: 0.7)
+    clean_joke_setup = remove_stop_words(@joke.setup)
+    clean_joke_punchline = remove_stop_words(@joke.punchline)
+
+    # Search using clean setup and punchline
+    jokes = Joke
+      .where.not(id: @joke.id)
+      .search_any(clean_joke_setup + " " + clean_joke_punchline)
+
+    @corpus = jokes.map{|j| TfIdfSimilarity::Document.new(preprocess(j.setup + " " + j.punchline)) }
+    @corpus << @joke_document
+
+    # Create a TfIdf model from the corpus
+    model = TfIdfSimilarity::TfIdfModel.new(@corpus, library: :narray)
+
+    # Compute the similarity matrix
+    similarity_matrix = model.similarity_matrix
+
+    # Find similar jokes
     similarities = {}
-    puts "Finding Duplicates..."
     @corpus.each_with_index do |doc, index|
-      sim = @matrix[@model.document_index(doc), @model.document_index(joke_document)]
+      sim = similarity_matrix[model.document_index(doc), model.document_index(@joke_document)]
       # Store the similarity if it's above the threshold
       similarities[jokes[index]] = sim if sim > threshold
     end
@@ -33,14 +39,20 @@ class FindDuplicateJokes
 
   private
 
+  def remove_stop_words(text)
+    text
+      .downcase
+      .gsub(/[^a-z0-9\s]/i, '')
+      .split(' ')
+      .reject { |word| STOP_WORDS.include?(word) }
+      .map(&:strip)
+      .join(' ')
+  end
+
   # Preprocess text by downcasing and removing non-alphanumeric characters, except spaces
   def preprocess(text)
-    text.downcase.gsub(/[^0-9a-z ]/i, '')
+    text
+      .downcase
+      .gsub(/[^0-9a-z ]/i, '')
   end
 end
-
-# Example usage
-# jokes = [Joke.new("setup1", "punchline1"), Joke.new("setup2", "punchline2"), ...]
-# finder = FindDuplicates.new(jokes)
-# duplicates = finder.find_duplicates(jokes[0])
-# puts duplicates
