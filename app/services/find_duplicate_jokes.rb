@@ -28,8 +28,11 @@ class FindDuplicateJokes
 
     # Find similar jokes
     similarities = {}
+    joke_index = model.document_index(@joke_document) 
     @corpus.each_with_index do |doc, index|
-      sim = similarity_matrix[model.document_index(doc), model.document_index(@joke_document)]
+      next if index == joke_index
+      
+      sim = similarity_matrix[model.document_index(doc), joke_index]
       # Store the similarity if it's above the threshold
       similarities[jokes[index]] = sim if sim > threshold
     end
