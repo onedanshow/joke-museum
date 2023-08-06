@@ -5,10 +5,21 @@ class ProcessPage
 
   def call(page)
     shopify_page = find_or_initialize_shopify_page(page)
-
+    shopify_page.page_id = page.shopify_id
     shopify_page.title = "#{page.jokes.count}+ #{page.keywords.titleize} Jokes"
     shopify_page.handle = page.handle
-    shopify_page.body_html = build_html_body(page.jokes)
+    shopify_page.body_html = "The best #{page.keywords} jokes around about."
+    shopify_page.metafields = [{
+      key: "jokes",
+      value: page.jokes.map{|j| "#{j.setup}||#{j.punchline}"}.join("%%"),
+      type: "multi_line_text_field",
+      namespace: "moj"
+    },{
+      key: "related_pages",
+      value: MatchPages.new(page).call.join(","),
+      type: "single_line_text_field",
+      namespace: "moj"
+    }]
 
     if shopify_page.save!
       page.update!(shopify_id: shopify_page.id)
@@ -16,39 +27,20 @@ class ProcessPage
     else
       puts "FAILED for Page (#{page.id}): #{page.keywords}"
     end
-
-    set_related_pages_shopify_metafield(shopify_page, page)
   rescue ShopifyAPI::Errors::HttpResponseError => e
-    puts "Shopify API error for #{page.keywords}: #{e.message}"
+    puts "Shopify API error for #{page.keywords} (Shopify ID: #{shopify_page.id}): #{e.message}"
   end
 
   private
 
   def find_or_initialize_shopify_page(page)
-    spage = nil
-    spage ||= ShopifyAPI::Page.find(id: page.shopify_id, session: @session) if page.shopify_id.present?
-    spage ||= begin
+    shopify_page = nil
+    shopify_page ||= ShopifyAPI::Page.find(id: page.shopify_id, session: @session) if page.shopify_id.present?
+    shopify_page = begin
       shopify_pages = ShopifyAPI::Page.all(handle: page.handle, session: @session)
       shopify_pages.first
-    end if page.handle.present?
+    end if page.handle.present? && page.shopify_id.blank?
     
-    spage || ShopifyAPI::Page.new(session: @session)
-  end
-
-  # TODO: set_jokes_shopify_metafield to replace this
-  def build_html_body(jokes)
-    jokes.reduce("<ul>") do |html, joke|
-      html + "<li><h2>#{joke.setup}</h2><p>#{joke.punchline}</p></li>"
-    end + "</ul>"
-  end
-
-  def set_related_pages_shopify_metafield(shopify_page, page)
-    metafield = ShopifyAPI::Metafield.new(session: @session)
-    metafield.page_id = shopify_page.id
-    metafield.namespace = "moj"
-    metafield.key = "related_pages"
-    metafield.value = MatchPages.new(page).call.join(",")
-    metafield.type = "single_line_text_field"
-    metafield.save!
+    shopify_page || ShopifyAPI::Page.new(session: @session)
   end
 end

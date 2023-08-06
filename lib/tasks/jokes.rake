@@ -25,4 +25,14 @@ namespace :jokes do
       ProcessJoke.new(joke).process
     end
   end
+
+  desc "Process jokes to extract entities, nouns and verbs"
+  task dedupe: :environment do
+    Joke.find_each do |joke|
+      ProcessDuplicateJokes.new(joke).call
+      sleep 0.5
+
+      # TODO: Add smarts to ignore jokes with no pages because it's a duplicate
+    end
+  end
 end

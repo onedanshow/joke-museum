@@ -1,9 +1,14 @@
 class Page < ApplicationRecord
-  has_and_belongs_to_many :jokes
+  has_many :page_jokes, -> { where(duplicate: false) }, dependent: :destroy
+  has_many :jokes, through: :page_jokes
 
   validates :keywords, uniqueness: true, presence: true
 
   before_create :set_handle
+
+  def jokes_including_duplicates
+    page_jokes.unscope(where: :duplicate).joins(:joke).select('jokes.*')
+  end
 
   private
 

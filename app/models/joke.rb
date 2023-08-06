@@ -13,5 +13,6 @@ class Joke < ApplicationRecord
   scope :clean, -> { where(classification: %i[unclassified training_clean ai_clean]) }
 
   belongs_to :source, optional: true
-  has_and_belongs_to_many :pages
+  has_many :page_jokes, dependent: :destroy
+  has_many :pages, through: :page_jokes
 end

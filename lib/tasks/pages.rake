@@ -11,7 +11,7 @@ namespace :pages do
 
     Page.find_each do |page|
       next if page.jokes.count < 3
-      puts "#{count}: Processing Page #{page.id}: #{page.keywords}"
+      puts "#{count}: Processing Page #{page.id} (Shopify ID: #{page.shopify_id}): #{page.keywords}"
 
       service.call(page)
       sleep 0.5

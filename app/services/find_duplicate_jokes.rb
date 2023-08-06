@@ -2,20 +2,24 @@ require 'narray'
 require 'tf-idf-similarity'
 
 class FindDuplicateJokes
-  def initialize(joke)
+  def initialize(joke, corpus_joke_ids: nil)
     @joke = joke
     @joke_document = TfIdfSimilarity::Document.new(preprocess(@joke.setup + " " + @joke.punchline))
+    @corpus_joke_ids = corpus_joke_ids
     @corpus = []
   end
 
-  def call(threshold: 0.7)
+  def call(threshold: 0.75)
     clean_joke_setup = remove_stop_words(@joke.setup)
     clean_joke_punchline = remove_stop_words(@joke.punchline)
 
-    # Search using clean setup and punchline
-    jokes = Joke
-      .where.not(id: @joke.id)
-      .search_any(clean_joke_setup + " " + clean_joke_punchline)
+    if @corpus_joke_ids.present?
+      # Search using ID provided
+      jokes = Joke.where.not(id: @joke.id).where(id: @corpus_joke_ids)
+    else
+      # Search using whole Joke database using stop-work-less setup and punchline
+      jokes = Joke.where.not(id: @joke.id).search_any(clean_joke_setup + " " + clean_joke_punchline)
+    end
 
     @corpus = jokes.map{|j| TfIdfSimilarity::Document.new(preprocess(j.setup + " " + j.punchline)) }
     @corpus << @joke_document
