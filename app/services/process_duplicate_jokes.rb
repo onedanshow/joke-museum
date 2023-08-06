@@ -7,6 +7,8 @@ class ProcessDuplicateJokes
   end
 
   def call(threshold: SIMILARITY_THRESHOLD)
+    puts "Processing duplicate jokes for joke #{joke.id} (#{joke.setup} #{joke.punchline}) with threshold #{threshold}"
+    
     # Iterate over each page that the joke appears on
     @joke.pages.each do |page|
       # Find potential duplicates on the page using the FindDuplicateJokes service class

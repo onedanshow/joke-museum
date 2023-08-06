@@ -7,10 +7,12 @@ class ProcessPage
     jokes = page.jokes.clean
 
     shopify_page = find_or_initialize_shopify_page(page)
-    shopify_page.id = page.shopify_id.presence
+    puts shopify_page.inspect
+    shopify_page.id = page.shopify_id if page.shopify_id.present?
+    shopify_page.author = "Museum of Jokes"
     shopify_page.title = "#{jokes.count}+ #{page.keywords.titleize} Jokes"
     shopify_page.handle = page.handle
-    shopify_page.body_html = "The best #{page.keywords} jokes around about!"
+    shopify_page.body_html = "<p>The Best #{page.keywords.titleize} jokes around about, all #{jokes.count} of them!</p>"
     shopify_page.published = page.published
     shopify_page.metafields = [{
       key: "jokes",
@@ -39,6 +41,7 @@ class ProcessPage
   def find_or_initialize_shopify_page(page)
     shopify_page = nil
     shopify_page = begin
+      puts "Had to look up page by handle #{page.handle}"
       shopify_pages = ShopifyAPI::Page.all(handle: page.handle, session: @session)
       shopify_pages.first
     end if page.handle.present? && page.shopify_id.blank?
