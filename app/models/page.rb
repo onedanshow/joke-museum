@@ -1,5 +1,5 @@
 class Page < ApplicationRecord
-  has_many :page_jokes, -> { where(duplicate: false) }, dependent: :destroy
+  has_many :page_jokes, -> { where(duplicate_of_id: nil) }, dependent: :destroy
   has_many :jokes, through: :page_jokes
 
   validates :keywords, uniqueness: true, presence: true
@@ -10,7 +10,7 @@ class Page < ApplicationRecord
   scope :published, -> { where(published: true) }
 
   def jokes_including_duplicates
-    page_jokes.unscope(where: :duplicate).joins(:joke).select('jokes.*')
+    page_jokes.unscope(where: :duplicate_of_id).joins(:joke).select('jokes.*')
   end
 
   private

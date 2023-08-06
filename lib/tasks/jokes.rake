@@ -30,6 +30,8 @@ namespace :jokes do
   task dedupe: :environment do
     Joke.find_each do |joke|
       ProcessDuplicateJokes.new(joke).call
+
+      break
       sleep 0.5
 
       # TODO: Add smarts to ignore jokes with no pages because it's a duplicate

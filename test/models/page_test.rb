@@ -10,8 +10,8 @@ class PageTest < ActiveSupport::TestCase
     joke2 = Joke.create!(setup: 'setup2', punchline: 'punchline2')
 
     # Create page_jokes records
-    PageJoke.create!(page: page, joke: joke1, duplicate: false)
-    PageJoke.create!(page: page, joke: joke2, duplicate: true)
+    PageJoke.create!(page: page, joke: joke1)
+    PageJoke.create!(page: page, joke: joke2, duplicate_of_id: joke1.id)
 
     # Assert that page.jokes only includes joke1
     assert_equal [joke1], page.jokes

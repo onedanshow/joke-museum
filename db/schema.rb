@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_06_172623) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_06_223903) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -28,7 +28,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_06_172623) do
   create_table "page_jokes", force: :cascade do |t|
     t.bigint "joke_id", null: false
     t.bigint "page_id", null: false
-    t.boolean "duplicate", default: false
+    t.bigint "duplicate_of_id"
+    t.index ["duplicate_of_id"], name: "index_page_jokes_on_duplicate_of_id"
     t.index ["joke_id", "page_id"], name: "index_jokes_pages_on_joke_id_and_page_id_uniq", unique: true
     t.index ["page_id", "joke_id"], name: "index_jokes_pages_on_page_id_and_joke_id_uniq", unique: true
   end
@@ -52,4 +53,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_06_172623) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "page_jokes", "jokes", column: "duplicate_of_id"
 end

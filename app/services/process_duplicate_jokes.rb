@@ -1,5 +1,7 @@
 class ProcessDuplicateJokes
-  SIMILARITY_THRESHOLD = 0.75
+  # Use 0.5 when comparing against other jokes on the same page
+  # Use 0.75 when comparing against all jokes in the database
+  SIMILARITY_THRESHOLD = 0.5
 
   def initialize(joke)
     @joke = joke
@@ -7,7 +9,7 @@ class ProcessDuplicateJokes
   end
 
   def call(threshold: SIMILARITY_THRESHOLD)
-    puts "Processing duplicate jokes for joke #{joke.id} (#{joke.setup} #{joke.punchline}) with threshold #{threshold}"
+    puts "Processing duplicate jokes for joke #{@joke.id} (#{@joke.setup} #{@joke.punchline}) with threshold #{threshold}"
     
     # Iterate over each page that the joke appears on
     @joke.pages.each do |page|
@@ -27,8 +29,8 @@ class ProcessDuplicateJokes
         next unless page_joke
 
         # Mark it as a duplicate
-        puts "Marking duplicate joke #{other_joke.id} (#{other_joke.setup} #{other_joke.punchline}) as duplicate on page #{page.handle} (#{page.id})"
-        page_joke.update!(duplicate: true)
+        puts "Marking joke #{other_joke.id} (#{other_joke.setup} #{other_joke.punchline}) as duplicate of #{oldest_joke.id} (#{oldest_joke.setup} #{oldest_joke.punchline}) on page #{page.handle} (#{page.id})"
+        page_joke.update!(duplicate_of_id: oldest_joke.id)
       end
 
       # Update the page on Shopify

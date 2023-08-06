@@ -13,7 +13,7 @@ class Joke < ApplicationRecord
   scope :clean, -> { where(classification: %i[unclassified training_clean ai_clean]) }
 
   belongs_to :source, optional: true
-  has_many :page_jokes, dependent: :destroy
+  has_many :page_jokes, -> { where(duplicate_of_id: nil) }, dependent: :destroy
   has_many :pages, through: :page_jokes
 
   # TODO: When Joke is saved, reprocess the joke in ProcessJoke to extract entities, nouns and verbs
