@@ -13,7 +13,6 @@ namespace :pages do
       next if page.jokes.clean.count < 3
 
       service.call(page)
-      sleep 0.5
       count += 1
     end
   end
