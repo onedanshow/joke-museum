@@ -10,8 +10,9 @@ class JokeDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::Number,
     joke_type: Field::Select.with_options(searchable: false, collection: ->(field) { field.resource.class.send(field.attribute.to_s.pluralize).keys }),
-    punchline: Field::Text,
-    setup: Field::Text,
+    punchline: Field::Text.with_options(searchable: true),
+    setup: Field::Text.with_options(searchable: true),
+    classification: Field::Select.with_options(searchable: false, collection: ->(field) { field.resource.class.send(field.attribute.to_s.pluralize).keys }),
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
   }.freeze
@@ -23,18 +24,19 @@ class JokeDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
     id
-    joke_type
-    punchline
     setup
+    punchline
+    classification
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
     id
-    joke_type
-    punchline
     setup
+    punchline
+    classification
+    joke_type
     created_at
     updated_at
   ].freeze
@@ -43,9 +45,10 @@ class JokeDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = %i[
-    joke_type
-    punchline
     setup
+    punchline
+    classification
+    joke_type
   ].freeze
 
   # COLLECTION_FILTERS

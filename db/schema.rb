@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_30_132458) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_06_223903) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -22,11 +22,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_30_132458) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "source_id"
+    t.integer "classification", default: 0
   end
 
-  create_table "jokes_pages", id: false, force: :cascade do |t|
+  create_table "page_jokes", force: :cascade do |t|
     t.bigint "joke_id", null: false
     t.bigint "page_id", null: false
+    t.bigint "duplicate_of_id"
+    t.index ["duplicate_of_id"], name: "index_page_jokes_on_duplicate_of_id"
     t.index ["joke_id", "page_id"], name: "index_jokes_pages_on_joke_id_and_page_id_uniq", unique: true
     t.index ["page_id", "joke_id"], name: "index_jokes_pages_on_page_id_and_joke_id_uniq", unique: true
   end
@@ -38,6 +41,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_30_132458) do
     t.datetime "updated_at", null: false
     t.bigint "excluded_joke_ids", default: [], array: true
     t.string "handle"
+    t.boolean "published", default: true
     t.index ["handle"], name: "index_pages_on_handle", unique: true
     t.index ["keywords"], name: "index_pages_on_keywords", unique: true
   end
@@ -49,4 +53,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_30_132458) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "page_jokes", "jokes", column: "duplicate_of_id"
 end
