@@ -11,6 +11,8 @@ class PageDashboard < Administrate::BaseDashboard
     id: Field::Number,
     jokes: Field::HasMany,
     keywords: Field::String,
+    handle: Field::String,
+    published: Field::Boolean,
     shopify_id: Field::Number,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
@@ -23,9 +25,11 @@ class PageDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
     id
-    jokes
     keywords
-    created_at
+    jokes
+    handle
+    shopify_id
+    published
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -44,6 +48,7 @@ class PageDashboard < Administrate::BaseDashboard
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = %i[
     keywords
+    published
     shopify_id
   ].freeze
 

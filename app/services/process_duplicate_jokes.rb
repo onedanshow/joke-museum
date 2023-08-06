@@ -3,8 +3,7 @@ class ProcessDuplicateJokes
 
   def initialize(joke)
     @joke = joke
-    @session = ShopifyAPI::Auth::Session.new(shop: 'gossamergeardev.myshopify.com', access_token: ENV['SHOPIFY_ADMIN_API_ACCESS_TOKEN'])
-    @page_service = ProcessPage.new(@session)
+    @page_service = ProcessPage.new
   end
 
   def call(threshold: SIMILARITY_THRESHOLD)

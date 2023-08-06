@@ -1,18 +1,21 @@
 class ProcessPage
-  def initialize(session)
-    @session = session
+  def initialize(session: nil)
+    @session = session || ShopifyAPI::Auth::Session.new(shop: 'gossamergeardev.myshopify.com', access_token: ENV['SHOPIFY_ADMIN_API_ACCESS_TOKEN'])
   end
 
   def call(page)
+    jokes = page.jokes.clean
+
     shopify_page = find_or_initialize_shopify_page(page)
-    shopify_page.page_id = page.shopify_id
-    shopify_page.title = "#{page.jokes.count}+ #{page.keywords.titleize} Jokes"
+    shopify_page.id = page.shopify_id.presence
+    shopify_page.title = "#{jokes.count}+ #{page.keywords.titleize} Jokes"
     shopify_page.handle = page.handle
-    shopify_page.body_html = "The best #{page.keywords} jokes around about."
+    shopify_page.body_html = "The best #{page.keywords} jokes around about!"
+    shopify_page.published = page.published
     shopify_page.metafields = [{
       key: "jokes",
-      value: page.jokes.map{|j| "#{j.setup}||#{j.punchline}"}.join("%%"),
-      type: "multi_line_text_field",
+      value: jokes.map{|j| "#{j.setup}||#{j.punchline}"}.to_json,
+      type: "json",
       namespace: "moj"
     },{
       key: "related_pages",
@@ -25,7 +28,7 @@ class ProcessPage
       page.update!(shopify_id: shopify_page.id)
       puts "Created/updated Shopify Page (ID: #{shopify_page.id}) from local Page (ID: #{page.id}): #{page.keywords}"
     else
-      puts "FAILED for Page (#{page.id}): #{page.keywords}"
+      puts "FAILED for Page (ID #{page.id}): #{page.keywords}"
     end
   rescue ShopifyAPI::Errors::HttpResponseError => e
     puts "Shopify API error for #{page.keywords} (Shopify ID: #{shopify_page.id}): #{e.message}"
@@ -35,7 +38,6 @@ class ProcessPage
 
   def find_or_initialize_shopify_page(page)
     shopify_page = nil
-    shopify_page ||= ShopifyAPI::Page.find(id: page.shopify_id, session: @session) if page.shopify_id.present?
     shopify_page = begin
       shopify_pages = ShopifyAPI::Page.all(handle: page.handle, session: @session)
       shopify_pages.first

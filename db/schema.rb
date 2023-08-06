@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_05_161238) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_06_172623) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -40,6 +40,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_05_161238) do
     t.datetime "updated_at", null: false
     t.bigint "excluded_joke_ids", default: [], array: true
     t.string "handle"
+    t.boolean "published", default: true
     t.index ["handle"], name: "index_pages_on_handle", unique: true
     t.index ["keywords"], name: "index_pages_on_keywords", unique: true
   end

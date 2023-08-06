@@ -15,4 +15,7 @@ class Joke < ApplicationRecord
   belongs_to :source, optional: true
   has_many :page_jokes, dependent: :destroy
   has_many :pages, through: :page_jokes
+
+  # TODO: When Joke is saved, reprocess the joke in ProcessJoke to extract entities, nouns and verbs
+  # after_save :process_joke
 end
