@@ -48,7 +48,7 @@ class ProcessPage
     metafield.page_id = shopify_page.id
     metafield.namespace = "moj"
     metafield.key = "jokes"
-    metafield.value = jokes.map{|j| "#{j.setup}||#{j.punchline}"}.to_json
+    metafield.value = jokes.shuffle.map{|j| "#{j.setup}||#{j.punchline}"}.to_json
     metafield.type = "json"
     metafield.save!
   end
