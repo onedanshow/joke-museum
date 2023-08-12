@@ -6,6 +6,7 @@ namespace :orders do
     loop do
       count = ShopifyAPI::Order.count(status: :any, session: session)
       puts "Found #{count.body['count']} orders to delete."
+      
       # Fetch orders in batches using since_id for pagination
       orders = ShopifyAPI::Order.all(status: :any, limit: 250, session: session)
       
@@ -13,12 +14,16 @@ namespace :orders do
 
       # Process the batch
       orders.each do |order|
-        ShopifyAPI::Order.delete(
-          session: session,
-          id: order.id,
-        )
-        puts "Deleted order ##{order.id}"
-        sleep 0.5 # to avoid hitting API call limits
+        begin
+          ShopifyAPI::Order.delete(
+            session: session,
+            id: order.id,
+          )
+          puts "Deleted order ##{order.id}"
+          sleep 0.5 # to avoid hitting API call limits
+        rescue ShopifyAPI::Errors::HttpResponseError => e
+          puts "Failed to delete order ##{order.id}. Error: #{e.message}"
+        end
       end
     end
   end
