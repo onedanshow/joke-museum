@@ -23,6 +23,8 @@ namespace :customers do
           sleep 0.5 # to avoid hitting API call limits
         rescue ShopifyAPI::Errors::HttpResponseError => e
           puts "Failed to delete customer ##{customer.id}. Error: #{e.message}"
+        rescue Net::OpenTimeout => e
+          puts "Timeout error for customer ##{customer.id}. Error: #{e.message}. Moving on to the next customer."
         end
       end
     end
