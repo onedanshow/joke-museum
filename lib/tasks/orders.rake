@@ -21,10 +21,8 @@ namespace :orders do
           )
           puts "Deleted order ##{order.id}"
           sleep 0.5 # to avoid hitting API call limits
-        rescue ShopifyAPI::Errors::HttpResponseError => e
-          puts "Failed to delete order ##{order.id}. Error: #{e.message}"
-        rescue Net::OpenTimeout => e
-          puts "Timeout error for order ##{order.id}. Error: #{e.message}. Moving on to the next order."
+        rescue ShopifyAPI::Errors::HttpResponseError, Net::OpenTimeout, SocketError => e
+          puts "Error for order ##{order.id}. Error: #{e.message}. Moving on to the next order."
         end
       end
     end

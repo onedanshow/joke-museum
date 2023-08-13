@@ -6,7 +6,7 @@ namespace :customers do
     loop do
       count = ShopifyAPI::Customer.count(session: session)
       puts "Found #{count.body['count']} customers to delete."
-
+      
       # Fetch customers in batches
       customers = ShopifyAPI::Customer.all(limit: 250, session: session)
       
@@ -21,10 +21,8 @@ namespace :customers do
           )
           puts "Deleted customer ##{customer.id}"
           sleep 0.5 # to avoid hitting API call limits
-        rescue ShopifyAPI::Errors::HttpResponseError => e
-          puts "Failed to delete customer ##{customer.id}. Error: #{e.message}"
-        rescue Net::OpenTimeout => e
-          puts "Timeout error for customer ##{customer.id}. Error: #{e.message}. Moving on to the next customer."
+        rescue ShopifyAPI::Errors::HttpResponseError, Net::OpenTimeout, SocketError => e
+          puts "Error for customer ##{customer.id}. Error: #{e.message}. Moving on to the next customer."
         end
       end
     end
