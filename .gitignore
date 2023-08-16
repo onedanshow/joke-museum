@@ -35,4 +35,5 @@
 
 .env
 /lib/*.csv
+/lib/*.json
 .DS_Store
