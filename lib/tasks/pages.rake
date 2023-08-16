@@ -8,12 +8,17 @@ namespace :pages do
     session = ShopifyAPI::Auth::Session.new(shop: 'gossamergeardev.myshopify.com', access_token: ENV['SHOPIFY_ADMIN_API_ACCESS_TOKEN'])
     service = ProcessPage.new(session: session)
     count = 1
-
+  
     Page.find_each do |page|
       next if page.jokes.clean.count < 3
-
-      service.call(page)
-      count += 1
+  
+      begin
+        service.call(page)
+        count += 1
+      rescue Net::ReadTimeout => e
+        puts "Encountered a timeout error for page ID ##{page.id}: #{e.message}. Moving on to the next page."
+        next
+      end
     end
   end
 
