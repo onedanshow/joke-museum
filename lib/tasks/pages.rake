@@ -15,8 +15,8 @@ namespace :pages do
       begin
         service.call(page)
         count += 1
-      rescue Net::ReadTimeout => e
-        puts "Encountered a timeout error for page ID ##{page.id}: #{e.message}. Moving on to the next page."
+      rescue Net::ReadTimeout, Net::OpenTimeout, Errno::ECONNRESET => e
+        puts "Encountered an error for page ID ##{page.id}: #{e.message}. Moving on to the next page."
         next
       end
     end
